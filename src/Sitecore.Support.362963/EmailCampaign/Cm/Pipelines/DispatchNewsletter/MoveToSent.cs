@@ -6,14 +6,17 @@
     using Sitecore.EmailCampaign.Model.Message;
     using Sitecore.ExM.Framework.Diagnostics;
     using Sitecore.SecurityModel;
+    using Sitecore.Modules.EmailCampaign.Core.Data;
     public class MoveToSent
     {
         private readonly ILogger _logger;
+        private readonly EcmDataProvider _dataProvider;
 
-        public MoveToSent([NotNull] ILogger logger)
+        public MoveToSent(ILogger logger, EcmDataProvider dataProvider)
         {
             Assert.ArgumentNotNull(logger, "logger");
             _logger = logger;
+            _dataProvider = dataProvider;
         }
 
         public void Process(DispatchNewsletterArgs args)
@@ -38,6 +41,7 @@
                 args.Message.Source.ReleaseRelatedItems();
                 args.Message.Source.State = MessageState.Sent;
                 args.Message.Source.EndTime = DateTime.UtcNow;
+                _dataProvider.SaveCampaign(args.Message, null);
             }
         }
     }
